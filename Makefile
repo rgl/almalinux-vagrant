@@ -1,4 +1,4 @@
-VERSION=8.6
+VERSION=9
 
 help:
 	@echo type make build-libvirt

@@ -5,12 +5,12 @@ variable "disk_size" {
 
 variable "iso_url" {
   type    = string
-  default = "http://mirrors.ptisp.pt/almalinux/8/isos/x86_64/AlmaLinux-8.6-x86_64-boot.iso"
+  default = "http://mirrors.pt/almalinux/9.0/isos/x86_64/AlmaLinux-9.0-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:de92004fcc5bb5b9af586c9b5ab0e0c7c5a5eedce4d2be85156c5dd31a4fa81b"
+  default = "sha256:c41ce7bc2f4ab27a3597b3e160fc8b01c56a6b58e1046a4a23b8518fb9e9a61f"
 }
 
 variable "ks" {
@@ -20,7 +20,7 @@ variable "ks" {
 
 variable "version" {
   type = string
-  default = "8.6"
+  default = "9"
 }
 
 variable "vagrant_box" {

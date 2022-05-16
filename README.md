@@ -1,6 +1,6 @@
 This builds an up-to-date Vagrant AlmaLinux Base Box.
 
-Currently this targets [AlmaLinux 8.6](https://almalinux.org/).
+Currently this targets [AlmaLinux 9](https://almalinux.org/).
 
 # Usage
 
@@ -40,9 +40,11 @@ its location in the `inst.ks` kernel command line argument.
 
 # Reference
 
+* [AlmaLinux 9.0 Release Notes](https://wiki.almalinux.org/release-notes/9.0.html)
+* [Product Documentation for Red Hat Enterprise Linux 9](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9)
 * [Anaconda boot options](https://anaconda-installer.readthedocs.io/en/latest/boot-options.html)
 * [Kickstart manual](http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html)
-* [Kickstart Syntax Reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart_references)
-* [Automating the Installation with Kickstart](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/performing_an_automated_installation_using_kickstart)
+* [Kickstart Syntax Reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_installation/kickstart_references)
+* [Automating the Installation with Kickstart](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_installation/performing_an_automated_installation_using_kickstart)
 * [Mirror list](https://mirrors.almalinux.org)
 * [AlmaLinux cloud-images](https://github.com/AlmaLinux/cloud-images)
