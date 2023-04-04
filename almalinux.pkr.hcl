@@ -5,7 +5,7 @@ variable "disk_size" {
 
 variable "iso_url" {
   type    = string
-  default = "http://mirrors.pt/almalinux/9.1/isos/x86_64/AlmaLinux-9.1-x86_64-boot.iso"
+  default = "http://mirrors.ptisp.pt/almalinux/9.1/isos/x86_64/AlmaLinux-9.1-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
