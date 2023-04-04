@@ -34,7 +34,7 @@ vagrant destroy -f
 
 The AlmaLinux installation iso uses the Anaconda installer to install AlmaLinux.
 During the installation it will ask you some questions and it will also
-store your anwsers in the `/root/anaconda-ks.cfg` (aka kickstart) file.
+store your answers in the `/root/anaconda-ks.cfg` (aka kickstart) file.
 This file is later used to fully automate a new installation by specifying
 its location in the `inst.ks` kernel command line argument.
 
