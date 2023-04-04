@@ -34,6 +34,7 @@ source "qemu" "almalinux-amd64" {
     "<up><tab>",
     "<leftCtrlOn>w<leftCtrlOff><bs>", // delete the "quiet" word.
     " net.ifnames=0",
+    " ipv6.disable=1",
     " inst.cmdline",
     " inst.ksstrict",
     " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
