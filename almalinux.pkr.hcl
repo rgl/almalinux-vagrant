@@ -33,6 +33,7 @@ source "qemu" "almalinux-amd64" {
   boot_command = [
     "<up><tab>",
     "<leftCtrlOn>w<leftCtrlOff><bs>", // delete the "quiet" word.
+    " net.ifnames=0",
     " inst.cmdline",
     " inst.ksstrict",
     " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
