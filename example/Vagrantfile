@@ -7,11 +7,15 @@ Vagrant.configure(2) do |config|
     lv.cpu_mode = 'host-passthrough'
     lv.nested = true
     lv.keymap = 'pt'
+    lv.disk_bus = 'scsi'
+    lv.disk_device = 'sda'
+    lv.disk_driver :discard => 'unmap', :cache => 'unsafe'
     config.vm.synced_folder '.', '/vagrant', type: 'nfs', nfs_version: '4.2', nfs_udp: false
   end
 
   config.vm.provision 'shell', inline: 'cat /etc/os-release'
   config.vm.provision 'shell', inline: 'echo "machine-id is $(cat /etc/machine-id)"'
+  config.vm.provision 'shell', inline: 'fdisk -l'
   config.vm.provision 'shell', inline: 'lsblk -o KNAME,SIZE,TRAN,FSTYPE,UUID,LABEL,MODEL,SERIAL'
   config.vm.provision 'shell', inline: 'df -h'
 end
