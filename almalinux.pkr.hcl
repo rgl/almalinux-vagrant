@@ -32,7 +32,7 @@ source "qemu" "almalinux-amd64" {
   machine_type = "q35"
   boot_command = [
     "<up><tab>",
-    "<leftCtrlOn>w<leftCtrlOff>", // delete the "quiet" word.
+    "<leftCtrlOn>w<leftCtrlOff><bs>", // delete the "quiet" word.
     " inst.cmdline",
     " inst.ksstrict",
     " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
