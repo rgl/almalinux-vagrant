@@ -14,12 +14,12 @@ variable "iso_checksum" {
 }
 
 variable "ks" {
-  type = string
+  type    = string
   default = "ks.cfg"
 }
 
 variable "version" {
-  type = string
+  type    = string
   default = "9"
 }
 
@@ -28,7 +28,7 @@ variable "vagrant_box" {
 }
 
 source "qemu" "almalinux-amd64" {
-  accelerator = "kvm"
+  accelerator  = "kvm"
   machine_type = "q35"
   boot_command = [
     "<up><tab>",
