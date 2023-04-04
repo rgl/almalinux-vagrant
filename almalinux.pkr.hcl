@@ -1,6 +1,6 @@
 variable "disk_size" {
   type    = string
-  default = "40960"
+  default = 40 * 1024 # MiB
 }
 
 variable "iso_url" {
