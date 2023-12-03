@@ -1,6 +1,6 @@
 #!/bin/bash
 # this will update the almalinux.json file with the current netboot image checksum.
-# see https://wiki.almalinux.org/release-notes/9.2.html#installation-instructions
+# see https://wiki.almalinux.org/release-notes/9.3.html#installation-instructions
 set -euxo pipefail
 wget -qO- https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux-9 | gpg --import
 iso_url=$(perl -n -e '/"(.+\.iso)"/ && print $1' almalinux.pkr.hcl)

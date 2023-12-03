@@ -5,12 +5,12 @@ variable "disk_size" {
 
 variable "iso_url" {
   type    = string
-  default = "http://mirrors.ptisp.pt/almalinux/9.2/isos/x86_64/AlmaLinux-9.2-x86_64-boot.iso"
+  default = "http://mirrors.ptisp.pt/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:f501de55f92e59a3fcf4ad252fdfc4e02ee2ad013d2e1ec818bb38052bcb3c32"
+  default = "sha256:af5377a1d16bbe599ea91a8761ad645f2f54687075802bdc0c0703ee610182e9"
 }
 
 variable "ks" {

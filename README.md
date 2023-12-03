@@ -40,7 +40,7 @@ its location in the `inst.ks` kernel command line argument.
 
 # Reference
 
-* [AlmaLinux 9.2 Release Notes](https://wiki.almalinux.org/release-notes/9.2.html)
+* [AlmaLinux 9.3 Release Notes](https://wiki.almalinux.org/release-notes/9.3.html)
 * [Product Documentation for Red Hat Enterprise Linux 9](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9)
 * [Anaconda boot options](https://anaconda-installer.readthedocs.io/en/latest/boot-options.html)
 * [Kickstart manual](http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html)
