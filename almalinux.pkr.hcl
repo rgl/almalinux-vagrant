@@ -5,12 +5,12 @@ variable "disk_size" {
 
 variable "iso_url" {
   type    = string
-  default = "http://mirrors.ptisp.pt/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-x86_64-boot.iso"
+  default = "http://mirrors.ptisp.pt/almalinux/10/isos/x86_64/AlmaLinux-10.0-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:3038fb71a29d33c3c93117bd8f4c3f612cb152dce057c666b6b11dfa793fb65c"
+  default = "sha256:a1549729bfb66a28e3546c953033c9928eae7280917bb1c490983dba3bb9941c"
 }
 
 variable "ks" {
@@ -20,7 +20,7 @@ variable "ks" {
 
 variable "version" {
   type    = string
-  default = "9"
+  default = "10"
 }
 
 variable "vagrant_box" {
@@ -31,14 +31,15 @@ source "qemu" "almalinux-amd64" {
   accelerator  = "kvm"
   machine_type = "q35"
   boot_command = [
-    "<up><tab>",
-    "<leftCtrlOn>w<leftCtrlOff><bs>", // delete the "quiet" word.
+    "<home>e", // edit the install boot entry.
+    "<down><down>", // go to the linux line.
+    "<end><bs><bs><bs><bs><bs><bs>", // delete the "quiet" word.
     " net.ifnames=0",
     " ipv6.disable=1",
     " inst.cmdline",
     " inst.ksstrict",
     " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
-    "<enter>"
+    "<f10>" // boot.
   ]
   boot_wait      = "5s"
   disk_cache     = "unsafe"

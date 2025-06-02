@@ -1,6 +1,6 @@
 This builds an up-to-date Vagrant AlmaLinux Base Box.
 
-Currently this targets [AlmaLinux 9](https://almalinux.org/).
+Currently this targets [AlmaLinux 10](https://almalinux.org/).
 
 # Usage
 
@@ -40,11 +40,12 @@ its location in the `inst.ks` kernel command line argument.
 
 # Reference
 
-* [AlmaLinux 9.5 Release Notes](https://wiki.almalinux.org/release-notes/9.5.html)
-* [Product Documentation for Red Hat Enterprise Linux 9](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9)
+* [AlmaLinux 10.0 Release Notes](https://wiki.almalinux.org/release-notes/10.0.html)
+* [Product Documentation for Red Hat Enterprise Linux 10](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/10)
 * [Anaconda boot options](https://anaconda-installer.readthedocs.io/en/latest/boot-options.html)
 * [Kickstart manual](http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html)
-* [Kickstart Syntax Reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_installation/kickstart_references)
-* [Automating the Installation with Kickstart](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/performing_an_advanced_rhel_installation/performing_an_automated_installation_using_kickstart)
+* [Kickstart script file format reference](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/automatically_installing_rhel/kickstart-script-file-format-reference)
+* [Kickstart commands and options reference](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/automatically_installing_rhel/kickstart-commands-and-options-reference)
+* [Automated installation workflow](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/automatically_installing_rhel/automated-installation-workflow)
 * [Mirror list](https://mirrors.almalinux.org)
 * [AlmaLinux cloud-images](https://github.com/AlmaLinux/cloud-images)

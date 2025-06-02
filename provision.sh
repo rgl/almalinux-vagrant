@@ -8,7 +8,7 @@ echo 'max_parallel_downloads=10' >>/etc/dnf/dnf.conf
 # remove old kernel packages.
 dnf remove -y $(rpm -qa 'kernel*' | grep -v "$(uname -r)" | tr \\n ' ')
 
-# remove uneeded firmware.
+# remove unneeded firmware.
 dnf remove -y linux-firmware
 
 # make sure we cannot directly login as root.
