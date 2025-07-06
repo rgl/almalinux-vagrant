@@ -1,3 +1,18 @@
+packer {
+  required_plugins {
+    # see https://github.com/hashicorp/packer-plugin-qemu
+    qemu = {
+      source  = "github.com/hashicorp/qemu"
+      version = "1.1.3"
+    }
+    # see https://github.com/hashicorp/packer-plugin-vagrant
+    vagrant = {
+      source  = "github.com/hashicorp/vagrant"
+      version = "1.1.5"
+    }
+  }
+}
+
 variable "disk_size" {
   type    = string
   default = 40 * 1024 # MiB
