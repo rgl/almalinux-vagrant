@@ -1,0 +1,135 @@
+packer {
+  required_plugins {
+    # see https://github.com/vmware/packer-plugin-vsphere
+    vsphere = {
+      version = "2.3.0"
+      source  = "github.com/vmware/vsphere"
+    }
+  }
+}
+
+variable "version" {
+  type = string
+}
+
+variable "disk_size" {
+  type    = string
+  default = 40 * 1024 # MiB
+}
+
+variable "vsphere_iso_url" {
+  type    = string
+  default = env("VSPHERE_OS_ISO")
+}
+
+variable "vsphere_host" {
+  type    = string
+  default = env("GOVC_HOST")
+}
+
+variable "vsphere_username" {
+  type    = string
+  default = env("GOVC_USERNAME")
+}
+
+variable "vsphere_password" {
+  type    = string
+  default = env("GOVC_PASSWORD")
+}
+
+variable "vsphere_esxi_host" {
+  type    = string
+  default = env("VSPHERE_ESXI_HOST")
+}
+
+variable "vsphere_datacenter" {
+  type    = string
+  default = env("GOVC_DATACENTER")
+}
+
+variable "vsphere_cluster" {
+  type    = string
+  default = env("GOVC_CLUSTER")
+}
+
+variable "vsphere_datastore" {
+  type    = string
+  default = env("GOVC_DATASTORE")
+}
+
+variable "vsphere_folder" {
+  type    = string
+  default = env("VSPHERE_TEMPLATE_FOLDER")
+}
+
+variable "vsphere_network" {
+  type    = string
+  default = env("VSPHERE_VLAN")
+}
+
+variable "ks" {
+  type    = string
+  default = "ks.cfg"
+}
+
+source "vsphere-iso" "almalinux-uefi-amd64" {
+  vm_name        = "almalinux-${var.version}-uefi-amd64"
+  http_directory = "."
+  guest_os_type  = "almalinux_64Guest"
+  storage {
+    disk_size             = var.disk_size
+    disk_thin_provisioned = true
+  }
+  disk_controller_type = ["pvscsi"]
+  vcenter_server       = var.vsphere_host
+  username             = var.vsphere_username
+  password             = var.vsphere_password
+  insecure_connection  = true
+  datacenter           = var.vsphere_datacenter
+  cluster              = var.vsphere_cluster
+  host                 = var.vsphere_esxi_host
+  folder               = var.vsphere_folder
+  datastore            = var.vsphere_datastore
+  network_adapters {
+    network      = var.vsphere_network
+    network_card = "vmxnet3"
+  }
+  convert_to_template = true
+  firmware            = "efi"
+  RAM                 = 4 * 1024
+  CPUs                = 2
+  iso_paths = [
+    var.vsphere_iso_url,
+  ]
+  ssh_username = "vagrant"
+  ssh_password = "vagrant"
+  boot_wait    = "15s"
+  boot_command = [
+    "<home>e",                       // edit the install boot entry.
+    "<down><down>",                  // go to the linux line.
+    "<end><bs><bs><bs><bs><bs><bs>", // delete the "quiet" word.
+    " net.ifnames=0",
+    " ipv6.disable=1",
+    " inst.cmdline",
+    " inst.ksstrict",
+    " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
+    "<f10>" // boot.
+  ]
+  shutdown_command = "echo vagrant | sudo -S poweroff"
+}
+
+build {
+  sources = [
+    "source.vsphere-iso.almalinux-uefi-amd64",
+  ]
+
+  provisioner "shell" {
+    expect_disconnect = true
+    execute_command   = "echo vagrant | sudo -S {{ .Vars }} bash {{ .Path }}"
+    scripts = [
+      "upgrade.sh",
+      "provision-guest-additions.sh",
+      "provision.sh"
+    ]
+  }
+}
