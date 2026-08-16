@@ -3,9 +3,11 @@ VERSION=10
 help:
 	@echo type one of:
 	@echo 	make build-uefi-libvirt
+	@echo 	make build-uefi-proxmox
 	@echo 	make build-uefi-vsphere
 
 build-uefi-libvirt: almalinux-${VERSION}-uefi-amd64-libvirt.box
+build-uefi-proxmox: almalinux-${VERSION}-uefi-amd64-proxmox.box
 build-uefi-vsphere: almalinux-${VERSION}-uefi-amd64-vsphere.box
 
 almalinux-${VERSION}-uefi-amd64-libvirt.box: ks.cfg upgrade.sh provision.sh almalinux.pkr.hcl Vagrantfile.template
@@ -15,6 +17,13 @@ almalinux-${VERSION}-uefi-amd64-libvirt.box: ks.cfg upgrade.sh provision.sh alma
 	PACKER_KEY_INTERVAL=10ms CHECKPOINT_DISABLE=1 PACKER_LOG=1 PACKER_LOG_PATH=$@.log PKR_VAR_version=${VERSION} PKR_VAR_vagrant_box=$@ \
 		packer build -only=qemu.almalinux-uefi-amd64 -on-error=abort -timestamp-ui almalinux.pkr.hcl
 	@./box-metadata.sh libvirt almalinux-${VERSION}-uefi-amd64 $@
+
+almalinux-${VERSION}-uefi-amd64-proxmox.box: ks.cfg upgrade.sh provision.sh almalinux.pkr.hcl Vagrantfile.template
+	rm -f $@
+	CHECKPOINT_DISABLE=1 PACKER_LOG=1 PACKER_LOG_PATH=$@.init.log \
+		packer init almalinux.pkr.hcl
+	CHECKPOINT_DISABLE=1 PACKER_LOG=1 PACKER_LOG_PATH=$@.log PKR_VAR_version=${VERSION} PKR_VAR_vagrant_box=$@ \
+		packer build -only=proxmox-iso.almalinux-uefi-amd64 -on-error=abort -timestamp-ui almalinux.pkr.hcl
 
 almalinux-${VERSION}-uefi-amd64-vsphere.box: tmp/ks-vsphere.cfg provision.sh almalinux-vsphere.pkr.hcl Vagrantfile.template
 	rm -f $@
@@ -34,4 +43,5 @@ tmp/ks-vsphere.cfg: ks.cfg
 
 .PHONY: \
 	build-uefi-libvirt \
+	build-uefi-proxmox \
 	build-uefi-vsphere

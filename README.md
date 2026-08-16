@@ -6,9 +6,17 @@ Currently this targets [AlmaLinux 10](https://almalinux.org/).
 
 Install [Packer](https://www.packer.io/) and [Vagrant](https://www.vagrantup.com/).
 
+If your host has multiple IP addresses, you might need to set the
+`PACKER_HTTP_BIND_ADDRESS` environment variable, e.g.:
+
+```bash
+export PACKER_HTTP_BIND_ADDRESS='192.168.8.11'
+```
+
 Depending on your hypervisor, follow its instructions:
 
 * [QEMU-KVM usage](#qemu-kvm-usage)
+* [Proxmox VE usage](#proxmox-ve-usage)
 * [VMware vSphere usage](#vmware-vsphere-usage)
 
 ## qemu-kvm usage
@@ -34,6 +42,33 @@ vagrant ssh
 exit
 vagrant destroy -f
 ```
+
+## Proxmox VE usage
+
+Install [Proxmox VE](https://www.proxmox.com/en/proxmox-ve).
+
+**NB** This assumes proxmox was installed alike [rgl/proxmox-ve](https://github.com/rgl/proxmox-ve).
+
+Set your proxmox details:
+
+```bash
+cat >secrets-proxmox.sh <<EOF
+#export PACKER_HTTP_BIND_ADDRESS='192.168.8.11'
+export PROXMOX_URL='https://192.168.1.21:8006/api2/json'
+export PROXMOX_USERNAME='root@pam'
+export PROXMOX_PASSWORD='vagrant'
+export PROXMOX_NODE='pve'
+EOF
+source secrets-proxmox.sh
+```
+
+Create the template:
+
+```bash
+make build-uefi-proxmox
+```
+
+**NB** There is no way to use the created template with vagrant (the [vagrant-proxmox plugin](https://github.com/telcat/vagrant-proxmox) is no longer compatible with recent vagrant versions). Instead, use packer (e.g. see this repository) or terraform (e.g. see [rgl/terraform-proxmox-almalinux-example](https://github.com/rgl/terraform-proxmox-almalinux-example)).
 
 ## VMware vSphere usage
 

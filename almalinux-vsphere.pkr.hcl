@@ -8,6 +8,11 @@ packer {
   }
 }
 
+variable "http_bind_address" {
+  type    = string
+  default = env("PACKER_HTTP_BIND_ADDRESS")
+}
+
 variable "version" {
   type = string
 }
@@ -73,9 +78,10 @@ variable "ks" {
 }
 
 source "vsphere-iso" "almalinux-uefi-amd64" {
-  vm_name        = "almalinux-${var.version}-uefi-amd64"
-  http_directory = "."
-  guest_os_type  = "almalinux_64Guest"
+  vm_name           = "almalinux-${var.version}-uefi-amd64"
+  http_bind_address = var.http_bind_address
+  http_directory    = "."
+  guest_os_type     = "almalinux_64Guest"
   storage {
     disk_size             = var.disk_size
     disk_thin_provisioned = true

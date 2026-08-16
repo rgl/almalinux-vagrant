@@ -5,12 +5,22 @@ packer {
       source  = "github.com/hashicorp/qemu"
       version = "1.1.6"
     }
+    # see https://github.com/hashicorp/packer-plugin-proxmox
+    proxmox = {
+      version = "1.2.4"
+      source  = "github.com/hashicorp/proxmox"
+    }
     # see https://github.com/hashicorp/packer-plugin-vagrant
     vagrant = {
       source  = "github.com/hashicorp/vagrant"
       version = "1.1.7"
     }
   }
+}
+
+variable "http_bind_address" {
+  type    = string
+  default = env("PACKER_HTTP_BIND_ADDRESS")
 }
 
 variable "disk_size" {
@@ -26,6 +36,11 @@ variable "iso_url" {
 variable "iso_checksum" {
   type    = string
   default = "sha256:b3f865468075bcada8f208d830289302c67529789d668041d24e8d6fc697ba6a"
+}
+
+variable "proxmox_node" {
+  type    = string
+  default = env("PROXMOX_NODE")
 }
 
 variable "ks" {
@@ -81,9 +96,76 @@ source "qemu" "almalinux-uefi-amd64" {
   shutdown_command = "echo vagrant | sudo -S poweroff"
 }
 
+source "proxmox-iso" "almalinux-uefi-amd64" {
+  template_name            = "template-almalinux-${var.version}-uefi"
+  template_description     = <<-EOS
+                              See https://github.com/rgl/almalinux-vagrant
+
+                              ```
+                              Build At: ${timestamp()}
+                              ```
+                              EOS
+  tags                     = "almalinux-${var.version}-uefi;template"
+  insecure_skip_tls_verify = true
+  node                     = var.proxmox_node
+  machine                  = "q35"
+  http_directory           = "."
+  http_bind_address        = var.http_bind_address
+  boot_command = [
+    "<home>e",                       // edit the install boot entry.
+    "<down><down>",                  // go to the linux line.
+    "<end><bs><bs><bs><bs><bs><bs>", // delete the "quiet" word.
+    " net.ifnames=0",
+    " ipv6.disable=1",
+    " inst.cmdline",
+    " inst.ksstrict",
+    " inst.ks=http://{{.HTTPIP}}:{{.HTTPPort}}/${var.ks}",
+    "<f10>" // boot.
+  ]
+  boot_wait = "5s"
+  bios      = "ovmf"
+  efi_config {
+    efi_storage_pool = "local-lvm"
+  }
+  cpu_type = "host"
+  cores    = 2
+  memory   = 4 * 1024
+  vga {
+    type   = "qxl"
+    memory = 16
+  }
+  network_adapters {
+    model  = "virtio"
+    bridge = "vmbr0"
+  }
+  scsi_controller = "virtio-scsi-single"
+  disks {
+    type         = "scsi"
+    io_thread    = true
+    ssd          = true
+    discard      = true
+    disk_size    = "${var.disk_size}M"
+    storage_pool = "local-lvm"
+    format       = "raw"
+  }
+  boot_iso {
+    type             = "scsi"
+    iso_storage_pool = "local"
+    iso_url          = var.iso_url
+    iso_checksum     = var.iso_checksum
+    iso_download_pve = true
+    unmount          = true
+  }
+  os           = "l26"
+  ssh_username = "vagrant"
+  ssh_password = "vagrant"
+  ssh_timeout  = "60m"
+}
+
 build {
   sources = [
     "source.qemu.almalinux-uefi-amd64",
+    "source.proxmox-iso.almalinux-uefi-amd64",
   ]
 
   provisioner "shell" {
@@ -97,6 +179,9 @@ build {
   }
 
   post-processor "vagrant" {
+    only = [
+      "qemu.almalinux-uefi-amd64",
+    ]
     output               = var.vagrant_box
     vagrantfile_template = "Vagrantfile.template"
   }
