@@ -4,7 +4,102 @@ VM_CPUS = 2
 VM_MEMORY = 4 * 1024 # MB
 VM_DISK = 64 # GB
 
+PROVISION_USERNAME = 'vagrant'
+PROVISION_PASSWORD = 'vagrant'
+
 require 'open3'
+
+def gzip_base64(data)
+  o = StringIO.new()
+  w = Zlib::GzipWriter.new(o)
+  w.write(data)
+  w.close()
+  Base64.strict_encode64(o.string)
+end
+
+# add the cloud-init data as a NoCloud cloud-init iso.
+# NB libvirtd libvirt-qemu:kvm MUST have read permissions to the iso file path.
+# see https://docs.cloud-init.io/en/25.1/reference/datasources/nocloud.html
+# see https://packages.fedoraproject.org/pkgs/cloud-init/cloud-init/
+def create_cloud_init_iso(cloud_init_data_path, env, config, group, cloud_init_user_data, cloud_init_network_config)
+  if !File.exist?(cloud_init_data_path) || File.mtime(cloud_init_data_path) < File.mtime(__FILE__)
+    cloud_init_data_parent_path = File.dirname(cloud_init_data_path)
+    FileUtils.mkdir_p(cloud_init_data_parent_path, :mode => 0750)
+    FileUtils.chown(nil, group, cloud_init_data_parent_path) if group
+    FileUtils.rm_f(cloud_init_data_path)
+    FileUtils.rm_rf('tmp/cidata')
+    FileUtils.mkdir_p('tmp/cidata')
+    File.write('tmp/cidata/meta-data', '{}')
+    File.write('tmp/cidata/user-data', "#cloud-config\n#{cloud_init_user_data.to_json}")
+    File.write('tmp/cidata/network-config', cloud_init_network_config.to_json)
+    env.ui.info "Creating the cloud-init cidata.iso file at #{cloud_init_data_path}..."
+    raise 'Failed to execute xorriso to create the cloud-init cidata.iso file' unless system(
+      'xorriso',
+        '-as', 'genisoimage',
+        '-output', cloud_init_data_path,
+        '-volid', 'cidata',
+        '-joliet',
+        '-rock',
+        'tmp/cidata')
+    env.ui.info 'The cloud-init cidata.iso file was created as:'
+    system('iso-info', '--no-header', '-i', cloud_init_data_path)
+  end
+end
+def create_cloud_init_iso_trigger(config, provider_name, group, cloud_init_user_data, cloud_init_network_config)
+  cloud_init_data_path = "#{ENV['TMP'] || '/tmp'}/cidata-#{provider_name}/cidata-#{Digest::SHA1.hexdigest(__FILE__)}.iso"
+  config.trigger.before :up do |trigger|
+    trigger.ruby do |env, machine|
+      create_cloud_init_iso(cloud_init_data_path, env, config, group, cloud_init_user_data, cloud_init_network_config)
+    end
+  end
+  cloud_init_data_path
+end
+
+# see https://docs.cloud-init.io/en/25.1/reference/network-config.html
+# see https://docs.cloud-init.io/en/25.1/reference/network-config-format-v2.html
+cloud_init_network_config = {
+  'version' => 2,
+  'ethernets' => {
+    'eth0' => {
+      'dhcp4' => true,
+      # NB uncomment these properties to configure a static IP address.
+      # 'dhcp4' => false,
+      # 'addresses' => [
+      #   '10.0.0.123/24',
+      # ],
+      # 'routes' => [
+      #   {
+      #     'to' => '0.0.0.0/0',
+      #     'via' => '10.0.0.1',
+      #   },
+      # ],
+      # 'nameservers' => {
+      #   'addresses' => [
+      #     '10.0.0.1',
+      #   ],
+      # },
+      'dhcp6' => false,
+    },
+  },
+}
+
+# see https://docs.cloud-init.io/en/25.1/explanation/format.html
+# see https://docs.cloud-init.io/en/25.1/reference/cloud-config.html
+# see https://docs.cloud-init.io/en/25.1/reference/modules.html
+cloud_init_user_data = {
+  # modify the provisioning user credentials.
+  'users' => [
+    {
+      'name' => PROVISION_USERNAME,
+      'plain_text_passwd' => PROVISION_PASSWORD,
+      'lock_passwd' => false,
+    },
+  ],
+  # NB the runcmd output is written to journald and /var/log/cloud-init-output.log.
+  'runcmd' => [
+    "echo '************** DONE RUNNING CLOUD-INIT **************'",
+  ],
+}
 
 Vagrant.configure(2) do |config|
   config.vm.box = 'almalinux-10-uefi-amd64'
@@ -19,6 +114,7 @@ Vagrant.configure(2) do |config|
     lv.disk_device = 'sda'
     lv.disk_driver :discard => 'unmap', :cache => 'unsafe'
     lv.machine_virtual_size = VM_DISK # GB
+    lv.storage :file, :device => :cdrom, :bus => 'sata', :path => create_cloud_init_iso_trigger(config, 'libvirt', 'kvm', cloud_init_user_data, cloud_init_network_config)
     config.vm.synced_folder '.', '/vagrant', type: 'nfs', nfs_version: '4.2', nfs_udp: false
   end
 
@@ -37,6 +133,21 @@ Vagrant.configure(2) do |config|
     vsphere.template_name = ENV['VSPHERE_TEMPLATE_NAME']
     vsphere.vm_base_path = ENV['VSPHERE_VM_FOLDER']
     vsphere.vlan = ENV['VSPHERE_VLAN']
+    # NB the extra_config data ends-up inside the VM .vmx file.
+    # NB the guestinfo properties are used by the VMware cloud-init datasource.
+    # see https://docs.cloud-init.io/en/25.1/reference/datasources/vmware.html
+    # see https://github.com/canonical/cloud-init/blob/25.1/cloudinit/sources/DataSourceVMware.py
+    # see /usr/lib/python3/dist-packages/cloudinit/sources/DataSourceVMware.py
+    # see https://packages.debian.org/trixie/cloud-init
+    vsphere.extra_config = {
+      'guestinfo.metadata' => gzip_base64({
+        'network' => gzip_base64(cloud_init_network_config.to_json),
+        'network.encoding' => 'gzip+base64',
+      }.to_json),
+      'guestinfo.metadata.encoding' => 'gzip+base64',
+      'guestinfo.userdata' => gzip_base64("#cloud-config\n#{cloud_init_user_data.to_json}"),
+      'guestinfo.userdata.encoding' => 'gzip+base64',
+    }
     if ENV['VAGRANT_SMB_PASSWORD']
       config.vm.synced_folder '.', '/vagrant',
         type: 'smb',
@@ -59,6 +170,9 @@ Vagrant.configure(2) do |config|
     end
   end
 
+  config.vm.provision 'shell', inline: 'cloud-init schema --system --annotate', name: 'validate cloud-init schema'
+  config.vm.provision 'shell', inline: 'cloud-init status --long --wait', name: 'wait for cloud-init to finish'
+  config.vm.provision 'shell', inline: "echo \"provisioning user is $(id #{PROVISION_USERNAME})\""
   config.vm.provision 'shell', path: 'provision-resize-disk.sh', name: 'Resize Disk'
   config.vm.provision 'shell', inline: 'cat /etc/os-release'
   config.vm.provision 'shell', inline: 'echo "machine-id is $(cat /etc/machine-id)"'
