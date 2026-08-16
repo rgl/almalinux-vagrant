@@ -42,12 +42,16 @@ variable "vagrant_box" {
   type = string
 }
 
-source "qemu" "almalinux-amd64" {
-  accelerator  = "kvm"
-  machine_type = "q35"
+source "qemu" "almalinux-uefi-amd64" {
+  headless          = true
+  accelerator       = "kvm"
+  machine_type      = "q35"
+  efi_boot          = true
+  efi_firmware_code = "/usr/share/OVMF/OVMF_CODE_4M.fd"
+  efi_firmware_vars = "/usr/share/OVMF/OVMF_VARS_4M.fd"
   boot_command = [
-    "<home>e", // edit the install boot entry.
-    "<down><down>", // go to the linux line.
+    "<home>e",                       // edit the install boot entry.
+    "<down><down>",                  // go to the linux line.
     "<end><bs><bs><bs><bs><bs><bs>", // delete the "quiet" word.
     " net.ifnames=0",
     " ipv6.disable=1",
@@ -62,13 +66,12 @@ source "qemu" "almalinux-amd64" {
   disk_interface = "virtio-scsi"
   disk_size      = var.disk_size
   format         = "qcow2"
-  headless       = true
   net_device     = "virtio-net"
   http_directory = "."
   iso_checksum   = var.iso_checksum
   iso_url        = var.iso_url
   cpus           = 2
-  memory         = 2048
+  memory         = 4 * 1024
   qemuargs = [
     ["-cpu", "host"],
   ]
@@ -80,7 +83,7 @@ source "qemu" "almalinux-amd64" {
 
 build {
   sources = [
-    "source.qemu.almalinux-amd64",
+    "source.qemu.almalinux-uefi-amd64",
   ]
 
   provisioner "shell" {

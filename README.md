@@ -16,7 +16,7 @@ apt-get install -y sysfsutils
 systool -m kvm_intel -v
 ```
 
-Type `make build-libvirt` and follow the instructions.
+Type `make build-uefi-libvirt` and follow the instructions.
 
 Try the example guest:
 
