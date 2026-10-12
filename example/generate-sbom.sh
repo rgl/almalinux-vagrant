@@ -5,11 +5,11 @@ name_prefix="${1:-almalinux-10-uefi-amd64}"
 
 # see https://github.com/anchore/syft/releases
 # renovate: datasource=github-releases depName=anchore/syft
-SYFT_VERSION='1.51.0'
+SYFT_VERSION='1.54.1'
 
 # see https://github.com/anchore/grype/releases
 # renovate: datasource=github-releases depName=anchore/grype
-GRYPE_VERSION='0.117.0'
+GRYPE_VERSION='0.120.1'
 
 # install dependencies.
 dnf install -y jq tar

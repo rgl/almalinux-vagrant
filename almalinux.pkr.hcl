@@ -3,7 +3,7 @@ packer {
     # see https://github.com/hashicorp/packer-plugin-qemu
     qemu = {
       source  = "github.com/hashicorp/qemu"
-      version = "1.1.6"
+      version = "1.1.7"
     }
     # see https://github.com/hashicorp/packer-plugin-proxmox
     proxmox = {

@@ -29,7 +29,11 @@ apt-get install -y sysfsutils
 systool -m kvm_intel -v
 ```
 
-Type `make build-uefi-libvirt` and follow the instructions.
+Create the box:
+
+```bash
+make build-uefi-libvirt
+```
 
 Try the example guest:
 
