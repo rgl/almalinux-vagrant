@@ -30,12 +30,12 @@ variable "disk_size" {
 
 variable "iso_url" {
   type    = string
-  default = "http://mirrors.ptisp.pt/almalinux/10/isos/x86_64/AlmaLinux-10.2-x86_64-boot.iso"
+  default = "http://mirrors.webhs.pt/almalinux/10/isos/x86_64/AlmaLinux-10.3-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "sha256:b3f865468075bcada8f208d830289302c67529789d668041d24e8d6fc697ba6a"
+  default = "sha256:d842df0dca98a3bf79c84cfcce49505ba7a7f56f03dcb02639b8377410154f4d"
 }
 
 variable "proxmox_node" {

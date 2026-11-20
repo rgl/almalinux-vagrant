@@ -93,7 +93,7 @@ export GOVC_PASSWORD='password'
 export GOVC_DATACENTER='Datacenter'
 export GOVC_CLUSTER='Cluster'
 export GOVC_DATASTORE='Datastore'
-export VSPHERE_OS_ISO="[$GOVC_DATASTORE] iso/AlmaLinux-10.2-x86_64-boot.iso"
+export VSPHERE_OS_ISO="[$GOVC_DATASTORE] iso/AlmaLinux-10.3-x86_64-boot.iso"
 export VSPHERE_ESXI_HOST='esxi.local'
 export VSPHERE_TEMPLATE_FOLDER='test/templates'
 export VSPHERE_TEMPLATE_NAME="$VSPHERE_TEMPLATE_FOLDER/almalinux-10-uefi-amd64"
@@ -149,7 +149,7 @@ its location in the `inst.ks` kernel command line argument.
 
 # Reference
 
-* [AlmaLinux 10.2 Release Notes](https://wiki.almalinux.org/release-notes/10.2.html)
+* [AlmaLinux 10.3 Release Notes](https://wiki.almalinux.org/release-notes/10.3.html)
 * [Product Documentation for Red Hat Enterprise Linux 10](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/10)
 * [Anaconda boot options](https://anaconda-installer.readthedocs.io/en/latest/boot-options.html)
 * [Kickstart manual](http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html)
